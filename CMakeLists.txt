@@ -56,7 +56,7 @@ endfunction()
 srcfileglob( plugin_srcfiles "src/*.cc" )
 srcfileglob( plugin_hdrfiles  "include/*.hh" )
 srcfileglob( plugin_hdrfiles_icc  "include/*.icc" )
-srcfileglob( plugin_datafiles  "data/*.ncmat" )
+srcfileglob( plugin_datafiles  "data/*.nxs" )
 list(APPEND plugin_hdrfiles ${plugin_hdrfiles_icc})
 srcfileglob( dummy "src/*.hh" )#To trigger reconf
 srcfileglob( dummy "src/*.icc" )#To trigger reconf
@@ -133,16 +133,16 @@ if (plugin_datafiles)
   #notice and fix any issues):
   foreach(df ${plugin_datafiles})
     get_filename_component(dfbn "${df}" NAME)
-    if(NOT dfbn MATCHES "ncplugin-${NCPlugin_NAME}_.+\.ncmat")
-      message(FATAL_ERROR "ERROR: name of exported datafile ${dfbn} does not have required form: ncplugin-${NCPlugin_NAME}_*.ncmat")
+    #Check that data file name follows convention: ncplugin-<pluginname>_*.nxs:
+    if(NOT dfbn MATCHES "ncplugin-${NCPlugin_NAME}_.+\.nxs")
+      message(FATAL_ERROR "ERROR: name of exported datafile ${dfbn} does not have required form: ncplugin-${NCPlugin_NAME}_*.nxs")
     endif()
   endforeach()
   if (NOT NCPLUGIN_DEVMODE)
-    #Check that data file name follows convention: ncplugin-<pluginname>_*.ncmat:
     if (NOT NCrystal_CMD_NCMAT2CPP)
       message(FATAL_ERROR "ERROR: NCrystal installation does not provide ncrystal_ncmat2cpp command which is needed to embed datafiles in plugin.")
     endif()
-    #Generate C++ code from the .ncmat files:
+    #Generate C++ code from the .nxs files:
     execute_process(COMMAND "${NCrystal_CMD_NCMAT2CPP}"
       "-n" "NCPluginNamespace::registerDataFiles"
       --include NCrystal/NCPluginBoilerplate.hh
@@ -152,7 +152,7 @@ if (plugin_datafiles)
     endif()
     target_sources(pluginlib PRIVATE "${PROJECT_BINARY_DIR}/autogen_${NCPlugin_NAME}_ncmat_data.cc")#too late to just append to plugin_srcfiles
     target_compile_definitions(pluginlib PRIVATE NCPLUGIN_DO_REGISTERDATAFILES)
-    message("-- Generated autogen_${NCPlugin_NAME}_ncmat_data.cc with embedded NCMAT data (will be compiled into the plugin library).")
+    message("-- Generated autogen_${NCPlugin_NAME}_ncmat_data.cc with embedded nxs data (will be compiled into the plugin library).")
   endif()
 endif()
 

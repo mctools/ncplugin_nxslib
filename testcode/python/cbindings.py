@@ -28,29 +28,28 @@ def _setuptestlibhooks():
     fct_getname.restype = ctypes.c_char_p
     assert fct_getname().decode('ascii') == _info.ncplugin_name, "inconsistent library loaded"
 
-    #Then the testcode library:
-    lib = ctypes.CDLL(_findlib())
+    #####Then the testcode library:
+    ####lib = ctypes.CDLL(_findlib())
+    ####
+    #####Dig out C-mangled (i.e. 'extern "C"') functions from the library, and
+    #####provide info about the function signature (i.e. return type and types and
+    #####numbers of arguments):
+    ####
+    #####Use numpy ctypes integration, to transparently accept numpy arrays as double* arguments.
+    ####from numpy.ctypeslib import ndpointer
+    ####npdoubleptr = ndpointer(ctypes.c_double, flags="C_CONTIGUOUS")
+    ####
+    ####f = lib.nctest_samplemanyscatmu
+    ####f.restype = None # void
+    ####f.argtypes = [ ctypes.c_double, ctypes.c_double, ctypes.c_double, ctypes.c_uint, npdoubleptr ]
+    ####hooks['samplemanyscatmu'] = f
+    ####
+    ####f = lib.nctest_getmanyxsvalues
+    ####f.restype = None # void
+    ####f.argtypes = [ ctypes.c_double, ctypes.c_double, ctypes.c_uint, npdoubleptr, npdoubleptr ]
+    ####hooks['getmanyxsvalues'] = f
 
-    #Dig out C-mangled (i.e. 'extern "C"') functions from the library, and
-    #provide info about the function signature (i.e. return type and types and
-    #numbers of arguments):
-
-    #Use numpy ctypes integration, to transparently accept numpy arrays as double* arguments.
-    from numpy.ctypeslib import ndpointer
-    npdoubleptr = ndpointer(ctypes.c_double, flags="C_CONTIGUOUS")
-
-    f = lib.nctest_samplemanyscatmu
-    f.restype = None # void
-    f.argtypes = [ ctypes.c_double, ctypes.c_double, ctypes.c_double, ctypes.c_uint, npdoubleptr ]
-    hooks['samplemanyscatmu'] = f
-
-    f = lib.nctest_getmanyxsvalues
-    f.restype = None # void
-    f.argtypes = [ ctypes.c_double, ctypes.c_double, ctypes.c_uint, npdoubleptr, npdoubleptr ]
-    hooks['getmanyxsvalues'] = f
-
-    hooks['ncplugin_register'] = lib.ncplugin_register
-
+    hooks['ncplugin_register'] = lib_ncplugin.ncplugin_register
     return hooks
 
 hooks = _setuptestlibhooks()

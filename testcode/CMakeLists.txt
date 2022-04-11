@@ -8,7 +8,7 @@ project(NCPluginTestCode_${NCPlugin_NAME} LANGUAGES CXX)
 
 option(NCPLUGIN_INSTALLSYMLINKS "Use symlinks when installing non-binary files (thus developers can avoid a build+install step when editing scripts and data files)" OFF)
 
-find_package(NCrystal 2.4.0 REQUIRED)
+find_package(NCrystal 2.9.92 REQUIRED)
 
 function(install_maybe_as_symlink installtype file)
   #Apparently cmake will install as symlinks if we first create the symlinks in
@@ -26,46 +26,6 @@ function(install_maybe_as_symlink installtype file)
   execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${file} ${symlinkdir}/${relpathfile})
   install(${installtype} ${symlinkdir}/${relpathfile} ${ARGN})
 endfunction()
-
-##### ----> The C++ library:
-srcfileglob(testcode_libsrc  "src/*.cc" )
-add_library( testlib SHARED ${testcode_libsrc} )
-target_link_libraries( testlib PUBLIC pluginlib )
-target_compile_definitions( testlib PUBLIC NCPLUGIN_NAME=${NCPlugin_NAME} )
-target_include_directories(testlib
-  PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-  PRIVATE  "${PROJECT_SOURCE_DIR}/src")
-set_target_properties( testlib PROPERTIES OUTPUT_NAME ${PROJECT_NAME} )
-install( TARGETS testlib EXPORT ${PROJECT_NAME}Targets DESTINATION lib )
-install( EXPORT ${PROJECT_NAME}Targets FILE "${PROJECT_NAME}Targets.cmake" NAMESPACE "${PROJECT_NAME}::" DESTINATION lib/cmake )
-add_library("${PROJECT_NAME}::testlib" ALIAS testlib)
-message("----> Will compile C++ library from sources in src/ and include/")
-
-
-##### ----> All the simple C++ applications:
-srcfileglob(testcode_appmains  "app_*/main.cc" )
-foreach(appmain ${testcode_appmains})
-  get_filename_component(appdir "${appmain}" DIRECTORY)
-  get_filename_component(appname "${appdir}" NAME)
-  string(REGEX REPLACE "^app_" "" appname "${appname}")
-  set(outname ncplugin_${appname})
-  message("----> Will compile app_${appname}/main.cc as ${outname} command")
-  set(apptgt app_${appname})
-  srcfileglob( tmp "app_${appname}/*.cc" )
-  add_executable(${apptgt} ${tmp} )
-  set_target_properties( ${apptgt} PROPERTIES OUTPUT_NAME ${outname} )
-  target_link_libraries( ${apptgt} pluginlib testlib )
-  #Set absolute rpaths for convenience:
-  get_filename_component( tmp "${CMAKE_INSTALL_PREFIX}/lib" ABSOLUTE)
-  set_target_properties( ${apptgt} PROPERTIES INSTALL_RPATH "${tmp}" )
-  install(TARGETS ${apptgt} DESTINATION bin )
-endforeach()
-
-#Dummy globs, just to force a reconfiguration in case of changes to C++ header
-#files:
-foreach(pattern "src/*.hh" "include/*.hh" "app_*/*.hh"  "src/*.icc" "include/*.icc" "app_*/*.icc")
-  srcfileglob(dummy  "${pattern}")
-endforeach()
 
 #Generate and install file with information for python module:
 set(PYDESTDIR "share/${PROJECT_NAME}/python/ncplugin")
@@ -109,10 +69,6 @@ function(install_datafiles datafiles datasubdir)
     install_maybe_as_symlink(FILES "${datafile}" DESTINATION share/${PROJECT_NAME}/data${dest})
   endforeach()
 endfunction()
-
-#Make test .ncmat files available as ncplugin/<filename>:
-srcfileglob( testcode_datafiles  "data/*.ncmat" )
-install_datafiles("${testcode_datafiles}" ncplugin)
 
 #Also make the public data files provided by the plugin available:
 install_datafiles("${plugin_datafiles}" "")

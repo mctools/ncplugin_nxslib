@@ -1,0 +1,11 @@
+#!/usr/bin/env python3
+
+
+import NCrystal as NC
+import numpy as np
+
+import ncplugin
+ncplugin.registerPlugin()#<---register our plugin with NCrystal
+
+
+print('This example does nothing currently')
