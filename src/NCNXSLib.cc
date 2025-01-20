@@ -47,6 +47,7 @@
 #define SGCLIB_C__
 #include "NCNXSLib.hh"
 
+#include <cstdio>//Added by NCrystal developers for std::snprintf
 #include <math.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -4209,7 +4210,7 @@ int CompleteSgInfo(T_SgInfo *SgInfo)
   {
     if (SgError) return -1;
 
-    sprintf(SgErrorBuffer,
+    std::snprintf(SgErrorBuffer,sizeof(SgErrorBuffer),
       "Internal Error: Input/Output HallSymbol mismatch: %s <> %s",
       SgInfo->TabSgName->HallSymbol, SgInfo->HallSymbol);
 
@@ -7276,7 +7277,7 @@ const char *FormatFraction(int nume, int deno, int Decimal,
   }
   if (Decimal)
   {
-    sprintf(Buffer, "%.6g", (double) nume / deno);
+    std::snprintf(Buffer, SizeBuffer, "%.6g", (double) nume / deno);
 
          cp = Buffer;
     if (*cp == '-') cp++;
@@ -7289,9 +7290,9 @@ const char *FormatFraction(int nume, int deno, int Decimal,
     SimplifyFraction(nume, deno, &n, &d);
 
     if (d == 1)
-      sprintf(Buffer, "%d", n);
+      std::snprintf(Buffer, SizeBuffer, "%d", n);
     else
-      sprintf(Buffer, "%d/%d", n, d);
+      std::snprintf(Buffer, SizeBuffer, "%d/%d", n, d);
   }
 
   if (Buffer[SizeBuffer - 1] != '\0') {
@@ -7551,7 +7552,7 @@ void ListSgInfo(const T_SgInfo *SgInfo, int F_XYZ, int F_Verbose, FILE *fpout)
 
       if (F_Verbose)
       {
-        sprintf(buf, "(%d)", iList + 1);
+        std::snprintf(buf,sizeof(buf), "(%d)", iList + 1);
         fprintf(fpout, "%-4s", buf);
 
         fprintf(fpout, "  %2d", rmxi->Order);
