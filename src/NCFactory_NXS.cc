@@ -19,9 +19,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "NCFactory_NXS.hh"
-#include "NCrystal/internal/NCMath.hh"
-#include "NCrystal/internal/NCAtomUtils.hh"
-#include "NCrystal/internal/NCLatticeUtils.hh"
+#include "NCrystal/internal/utils/NCMath.hh"
+#include "NCrystal/internal/utils/NCAtomUtils.hh"
+#include "NCrystal/internal/utils/NCLatticeUtils.hh"
 #include "NCNXSLib.hh"
 #include <cstdlib>
 #include <iostream>
@@ -281,7 +281,7 @@ NC::InfoBuilder::SinglePhaseBuilder NCP::loadNXSCrystal( const NC::TextData& tex
 
   if (enable_hkl) {
     NC::HKLList hklList;
-    hklList.reserve( nxs_uc.nHKL );
+    hklList.reserve_hint( nxs_uc.nHKL );
     nxs::NXS_HKL *it = &(nxs_uc.hklList[0]);
     nxs::NXS_HKL *itE = it + nxs_uc.nHKL;
     for (;it!=itE;++it) {
@@ -398,7 +398,7 @@ NC::InfoBuilder::SinglePhaseBuilder NCP::loadNXSCrystal( const NC::TextData& tex
   }
 
   NC::AtomInfoList atomList;
-  atomList.reserve(zval_2_atominfo.size());
+  atomList.reserve_hint(zval_2_atominfo.size());
   for (auto& e : zval_2_atominfo)
     atomList.push_back( e.second.moveToAtomInfo( nxs_uc.debyeTemp ) );//same Debye temp for all atoms
 

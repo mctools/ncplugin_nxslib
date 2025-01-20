@@ -1,9 +1,5 @@
 #include "NCPluginFactory.hh"
-#include "NCrystal/NCInfo.hh"
-#include "NCrystal/NCFactImpl.hh"
-#include "NCrystal/NCDataSources.hh"
-#include "NCrystal/NCMatCfg.hh"
-#include "NCrystal/internal/NCString.hh"
+#include "NCrystal/internal/utils/NCString.hh"
 #include "NCFactory_NXS.hh"
 #include <iostream>
 
