@@ -22,8 +22,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "NCrystal/NCPluginBoilerplate.hh"
-#include "NCrystal/NCTextData.hh"
-#include "NCrystal/NCInfoBuilder.hh"
+#include "NCrystal/internal/infobld/NCInfoBuilder.hh"
 
 namespace NCPluginNamespace {
 
