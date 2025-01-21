@@ -22,6 +22,7 @@
 #include "NCTestPlugin.hh"
 #include "NCrystal/internal/utils/NCMsg.hh"
 #include "NCrystal/internal/utils/NCMath.hh"
+#include "NCrystal/internal/utils/NCStrView.hh"
 
 void NCP::customPluginTest()
 {
@@ -67,35 +68,29 @@ void NCP::customPluginTest()
   auto info_braggonly = NC::createInfo( cfg_braggonly );
 
 
-  // auto scat_incelasonly = NC::createScatter( cfg_incelasonly );
-  // auto scat = NC::createScatter( cfg );
-  // auto scat_base = NC::createScatter( base_data );
-  // auto scat_base_noincelas = NC::createScatter( base_data + ";incoh_elas=0" );
 
-  // for ( auto& wlval : NC::linspace(0.1,3.1,16) ) {
-  //   auto wl = NC::NeutronWavelength( wlval );
-  //   auto xs = scat.crossSectionIsotropic( wl );
-  //   auto xs_incelasonly = scat_incelasonly.crossSectionIsotropic( wl );
+  {
+    NCRYSTAL_MSG("Loading plugins::nxslib/Al_sg225.nxs");
+    auto info2 = NC::createInfo( "plugins::nxslib/Al_sg225.nxs" );
+  }
 
-  //   auto xs_base = scat_base.crossSectionIsotropic( wl );
-  //   auto xs_base_noincelas = scat_base_noincelas.crossSectionIsotropic( wl );
-  //   NCRYSTAL_MSG( "xs @ "<<wl<<" : "
-  //                 <<xs_base<<" (base)"<<" "
-  //                 <<xs<<" (new)"<<" "
-  //                 <<xs_incelasonly<<" (new inc elas)"
-  //                 );
+  unsigned nfound = 0;
+  for ( auto& e : NC::DataSources::listAvailableFiles() ) {
+    if ( e.factName != "plugins" )
+      continue;
+    NC::StrView name(e.name);
+    if (!name.startswith("nxslib/"))
+      continue;
+    std::string key = e.factName + "::" + e.name;
+    NCRYSTAL_MSG("Loading "<<key);
+    auto iii = NC::createInfo( "plugins::nxslib/Al_sg225.nxs" );
+    auto sss = NC::createScatter( "plugins::nxslib/Al_sg225.nxs" );
+    auto aaa = NC::createAbsorption( "plugins::nxslib/Al_sg225.nxs" );
+    nfound += 1;
+  }
 
-  //   //Test that we get the expected values:
-  //   double expected_xs_incelasonly = ( wlval < custom_incohelas_wl_threshold
-  //                                      ? custom_incohelas_sigma : 0.0 );
-  //   double expected_xs = expected_xs_incelasonly + xs_base_noincelas.dbl();
-  //   nc_assert_always( NC::floateq( expected_xs_incelasonly,
-  //                                  xs_incelasonly.dbl() ) );
-  //   nc_assert_always( NC::floateq( expected_xs,
-  //                                  xs.dbl() ) );
-  // }
-
-  // //Note: We do not test the scattering here for this simple dummy plugin.
+  if ( nfound < 30 || nfound > 100 )
+    NCRYSTAL_THROW(CalcError,"Unexpected number of data files from plugin");
 
   NCRYSTAL_MSG("All tests of plugin "<<pluginName()<<" were successful!");
 }
