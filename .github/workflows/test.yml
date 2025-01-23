@@ -55,3 +55,5 @@ jobs:
         export NCRYSTAL_REQUIRED_PLUGINS=nxslib
         nctool --plugins
 
+    - name: Use nxs file
+      run: nctool -d 'plugins::nxslib/Au_sg225.nxs'
