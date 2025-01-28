@@ -23,13 +23,13 @@
 name = "ncrystal-plugin-nxslib"
 version = "0.0.1"
 license = {file = "LICENSE"}
-dependencies = [ "ncrystal-core>=3.9.81", "ncrystal-pypluginmgr>=0.0.3" ]
+dependencies = [ "ncrystal-core>=3.9.84", "ncrystal-pypluginmgr>=0.0.3" ]
 classifiers = [
     "License :: Free for non-commercial use",
 ]
 
 [build-system]
-requires = ["scikit-build-core>=0.10", "ncrystal-core>=3.9.81" ]
+requires = ["scikit-build-core>=0.10", "ncrystal-core>=3.9.84" ]
 build-backend = "scikit_build_core.build"
 
 [tool.scikit-build]
