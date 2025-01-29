@@ -7,7 +7,7 @@ on:
     - cron: '13 15 * * 0'  # 13:15 every Sunday
 
 jobs:
-  build:
+  build_and_test_plugin:
     strategy:
       matrix:
         os: [ ubuntu-latest, macos-latest, windows-latest ]
@@ -27,14 +27,14 @@ jobs:
 
     - name: Install ncrystal-core (Windows)
       if: runner.os == 'Windows'
-      run: pip install --config-settings=cmake.define.NCRYSTAL_WINEXPORTALL=ON --no-binary ':all:' ncrystal-core
+      run: pip install --config-settings=cmake.define.NCRYSTAL_WINEXPORTALL=ON --no-binary ':all:' "ncrystal-core>=3.9.85"
 
     - name: Install ncrystal-core (Unix)
       if: runner.os != 'Windows'
-      run: pip install ncrystal-core
+      run: pip install 'ncrystal-core>=3.9.85'
 
     - name: Install other dependencies
-      run: pip install "scikit-build-core>=0.10" ncrystal-pypluginmgr ncrystal-python
+      run: pip install "scikit-build-core>=0.10" "ncrystal-pypluginmgr>=0.0.3" "ncrystal-python>=3.9.85"
 
     - name: Install plugin
       #--no-build-isolation to prevent getting the ncrystal pkgs just installed
