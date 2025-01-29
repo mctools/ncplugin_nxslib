@@ -41,19 +41,28 @@ jobs:
       #to instead be taken from PyPI, thus breaking the windows build:
       run: pip install ./src --no-build-isolation
 
-    - name: Verify plugin loading (Windows)
-      if: runner.os == 'Windows'
+    - name: Verify plugin loading
+      shell: python
       run: |
-        set NCRYSTAL_PLUGIN_RUNTESTS=1
-        set NCRYSTAL_REQUIRED_PLUGINS=nxslib
-        nctool --plugins
-
-    - name: Verify plugin loading (Unix)
-      if: runner.os != 'Windows'
-      run: |
-        export NCRYSTAL_PLUGIN_RUNTESTS=1
-        export NCRYSTAL_REQUIRED_PLUGINS=nxslib
-        nctool --plugins
+        import os
+        os.environ['NCRYSTAL_PLUGIN_RUNTESTS'] = '1'
+        os.environ['NCRYSTAL_REQUIRED_PLUGINS'] = 'nxslib'
+        import NCrystal
+        NCrystal.browsePlugins(dump=True)
 
     - name: Use nxs file
       run: nctool -d 'plugins::nxslib/Au_sg225.nxs'
+
+    - name: Load all nxs files
+      shell: python
+      run: |
+        from NCrystal.datasrc import browseFiles
+        from NCrystal.core import createScatter
+        nfiles = 0
+        for f in browseFiles(factory='plugins'):
+            if f.name.startswith('nxslib/'):
+                nfiles += 1
+                print('Loading f.fullKey')
+                createScatter(f.fullKey)
+        if nfiles < 35:
+            raise SystemExit('Too few nxs files provided')
