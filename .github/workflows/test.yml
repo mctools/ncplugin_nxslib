@@ -25,16 +25,11 @@ jobs:
     #support windows, where ncrystal-core must be recompiled with
     #NCRYSTAL_WINEXPORTALL=ON to support usage with plugins:
 
-    - name: Install ncrystal-core (Windows)
-      if: runner.os == 'Windows'
-      run: pip install --config-settings=cmake.define.NCRYSTAL_WINEXPORTALL=ON --no-binary ':all:' "ncrystal-core>=3.9.85"
-
-    - name: Install ncrystal-core (Unix)
-      if: runner.os != 'Windows'
-      run: pip install 'ncrystal-core>=3.9.85'
+    - name: Install ncrystal-core
+      run: pip install 'ncrystal-core>=3.9.86'
 
     - name: Install other dependencies
-      run: pip install "scikit-build-core>=0.10" "ncrystal-pypluginmgr>=0.0.3" "ncrystal-python>=3.9.85"
+      run: pip install "scikit-build-core>=0.10" "ncrystal-pypluginmgr>=0.0.3" "ncrystal-python>=3.9.86"
 
     - name: Install plugin
       #--no-build-isolation to prevent getting the ncrystal pkgs just installed
