@@ -21,29 +21,13 @@ jobs:
       with:
         path: src
 
-    #The following is a bit more complicated than usual, since we also want to
-    #support windows, where ncrystal-core must be recompiled with
-    #NCRYSTAL_WINEXPORTALL=ON to support usage with plugins:
-
-    - name: Install ncrystal-core
-      run: pip install 'ncrystal-core>=3.9.86'
-
-    - name: Install other dependencies
-      run: pip install "scikit-build-core>=0.10" "ncrystal-pypluginmgr>=0.0.3" "ncrystal-python>=3.9.86"
-
+    - name: Install dependencies
+      run: pip install 'ncrystal-core>=3.9.87' "scikit-build-core>=0.10" "ncrystal-pypluginmgr>=0.0.5" "ncrystal-python>=3.9.87"
     - name: Install plugin
-      #--no-build-isolation to prevent getting the ncrystal pkgs just installed
-      #to instead be taken from PyPI, thus breaking the windows build:
-      run: pip install ./src --no-build-isolation
+      run: pip install ./src
 
     - name: Verify plugin loading
-      shell: python
-      run: |
-        import os
-        os.environ['NCRYSTAL_PLUGIN_RUNTESTS'] = '1'
-        os.environ['NCRYSTAL_REQUIRED_PLUGINS'] = 'nxslib'
-        import NCrystal
-        NCrystal.browsePlugins(dump=True)
+      run: ncrystal-pluginmanager --test nxslib|
 
     - name: Use nxs file
       run: nctool -d 'plugins::nxslib/Au_sg225.nxs'
