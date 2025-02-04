@@ -27,7 +27,7 @@ jobs:
       run: pip install ./src
 
     - name: Verify plugin loading
-      run: ncrystal-pluginmanager --test nxslib|
+      run: ncrystal-pluginmanager --test nxslib
 
     - name: Use nxs file
       run: nctool -d 'plugins::nxslib/Au_sg225.nxs'
