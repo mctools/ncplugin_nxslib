@@ -41,7 +41,7 @@ jobs:
         for f in browseFiles(factory='plugins'):
             if f.name.startswith('nxslib/'):
                 nfiles += 1
-                print('Loading f.fullKey')
+                print(f'Loading {f.fullKey}')
                 createScatter(f.fullKey)
         if nfiles < 35:
             raise SystemExit('Too few nxs files provided')
