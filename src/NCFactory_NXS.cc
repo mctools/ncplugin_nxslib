@@ -235,9 +235,15 @@ NC::InfoBuilder::SinglePhaseBuilder NCP::loadNXSCrystal( const NC::TextData& tex
   if (enable_hkl) {
     auto maxHKLFromDCut = [&nxs_uc]( double dcut )
     {
+#if NCRYSTAL_VERSION >= 4004007
+      //Since NCrystal 4.4.7, the estimate is valid for any lattice angles:
+      auto max_hkl = NC::estimateHKLRange( dcut,
+                                           nxs_uc.a, nxs_uc.b, nxs_uc.c );
+#else
       auto max_hkl = NC::estimateHKLRange( dcut,
                                            nxs_uc.a, nxs_uc.b, nxs_uc.c,
                                            nxs_uc.alpha * NC::kDeg, nxs_uc.beta * NC::kDeg, nxs_uc.gamma * NC::kDeg );
+#endif
       return std::max<int>( max_hkl.h, std::max<int>( max_hkl.k, max_hkl.l ) );
     };
 
