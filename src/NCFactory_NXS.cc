@@ -22,6 +22,9 @@
 #include "NCrystal/internal/utils/NCMath.hh"
 #include "NCrystal/internal/utils/NCAtomUtils.hh"
 #include "NCrystal/internal/utils/NCLatticeUtils.hh"
+#if NCRYSTAL_VERSION >= 4004007
+#  include "NCrystal/internal/extd_utils/NCInfoUtils.hh"
+#endif
 #include "NCNXSLib.hh"
 #include <cstdlib>
 #include <iostream>
@@ -127,7 +130,23 @@ namespace NCPluginNamespace {
     //Validate input, and replace b=0 and c=0 entries with a, for crystals where
     //it is allowed (this is needed since .nxs files allow b=0 or c=0 as
     //shorthand in cases where those are equal to a).
+#if NCRYSTAL_VERSION >= 4004007
+    {
+      NC::StructureInfo si;
+      si.spacegroup = uc->sgInfo.TabSgName->SgNumber;
+      si.lattice_a = uc->a;
+      si.lattice_b = uc->b;
+      si.lattice_c = uc->c;
+      si.alpha = uc->alpha;
+      si.beta = uc->beta;
+      si.gamma = uc->gamma;
+      NC::InfoUtils::completeAndCheckStructureInfoCell( si );
+      uc->b = si.lattice_b;
+      uc->c = si.lattice_c;
+    }
+#else
     NC::checkAndCompleteLattice( uc->sgInfo.TabSgName->SgNumber, uc->a, uc->b, uc->c );
+#endif
 
   }
   void deinitNXS_partly(nxs::NXS_UnitCell*uc)
@@ -372,11 +391,18 @@ NC::InfoBuilder::SinglePhaseBuilder NCP::loadNXSCrystal( const NC::TextData& tex
       NCRYSTAL_THROW2(BadInput,"unknown or unsupported element symbol specified in .nxs file: \""<<label
                       <<"\" (should be written like H, He, Li, ...)");
     const double nxsatom_capturexs = nxs_ai.sigmaAbsorption;
-    const double nxsatom_cohscatlen = nxs_ai.b_coherent*0.1;//unit fm-> 10fm=sqrt(barn) [c.f. note about coherentScatLen unit in NCAtomData.hh]
     const double nxsatom_incxs = nxs_ai.sigmaIncoherent;
     const double nxsatom_massamu = nxs_ai.M_m * NC::const_neutron_atomic_mass;
+#if NCRYSTAL_VERSION >= 4004007
+    //Since NCrystal 4.4.7, the coherent scattering length is given in fm:
+    NC::AtomData newatomdata( NC::SigmaBound{nxsatom_incxs},
+                              NC::AtomData::ScatLenFM{nxs_ai.b_coherent},
+                              NC::SigmaAbsorption{nxsatom_capturexs}, NC::AtomMass{nxsatom_massamu}, Zval );
+#else
+    const double nxsatom_cohscatlen = nxs_ai.b_coherent*0.1;//unit fm-> 10fm=sqrt(barn) [c.f. note about coherentScatLen unit in NCAtomData.hh]
     NC::AtomData newatomdata( NC::SigmaBound{nxsatom_incxs}, nxsatom_cohscatlen,
                               NC::SigmaAbsorption{nxsatom_capturexs}, NC::AtomMass{nxsatom_massamu}, Zval );
+#endif
 
     auto& ai = zval_2_atominfo[Zval];
     if ( ai.atomDataSP == nullptr ) {
