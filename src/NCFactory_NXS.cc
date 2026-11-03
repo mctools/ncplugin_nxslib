@@ -347,7 +347,11 @@ NC::InfoBuilder::SinglePhaseBuilder NCP::loadNXSCrystal( const NC::TextData& tex
   si.beta  = nxs_uc.beta;
   si.gamma = nxs_uc.gamma;
   si.volume = nxs_uc.volume;
+#if NCRYSTAL_VERSION >= 4004007
+  si.n_positions = nxs_uc.nAtoms;//n_atoms_average is completed by NCrystal
+#else
   si.n_atoms = nxs_uc.nAtoms;
+#endif
 
   //NB: delay actually adding to builder until atomList is also available below
 
